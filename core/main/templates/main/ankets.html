@@ -1,0 +1,70 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<body>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tittle</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Comment</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.age }}</td>
+                    <td>{{ item.comment }}</td>
+                    <td>{{ item.date }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    var offset = 20;
+    var loading = false;
+
+    function loadMoreData() {
+        if (loading) {
+            return;
+        }
+        loading = true;
+
+        $.get('/get_data/', { offset: offset }, function (data) {
+            if (data.length > 0) {
+                var rows = data.map(function(item) {
+                return '<tr><td>' + item.id +
+                       '</td><td>' + item.title +
+                       '</td><td>' + item.name +
+                       '</td><td>' + item.age +
+                       '</td><td>' + item.comment +
+                       '</td><td>' + item.date + '</td></tr>';
+            });
+            $('table tbody').append(rows.join(''));
+                offset += data.length;
+            }
+            loading = false;
+        });
+    }
+
+    $(document).ready(function () {
+        loadMoreData();
+
+        $(window).scroll(function () {
+            if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+                if (!loading) {
+                    loadMoreData();
+                }
+            }
+        });
+    });
+</script>
+</body>
+{% endblock %}
